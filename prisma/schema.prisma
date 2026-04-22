@@ -3,12 +3,12 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
   email         String    @unique
   name          String
   password      String
@@ -16,12 +16,12 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   
-  assignedFields Field[]  @relation("AssignedFields")
+  assignedFields Field[]  
   updates        Update[]
 }
 
 model Field {
-  id            String    @id @default(cuid())
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
   name          String
   cropType      String
   plantingDate  DateTime
@@ -32,14 +32,15 @@ model Field {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   
-  agent         User?     @relation("AssignedFields", fields: [agentId], references: [id])
+  agent         User?     @relation(fields: [agentId], references: [id])
   updates       Update[]
+  predictions   Prediction[]
 }
 
 model Update {
-  id            String    @id @default(cuid())
-  fieldId       String
-  userId        String
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  fieldId       String    @db.ObjectId
+  userId        String    @db.ObjectId
   newStage      Stage
   notes         String?
   healthScore   Int?
@@ -50,8 +51,8 @@ model Update {
 }
 
 model Prediction {
-  id            String    @id @default(cuid())
-  fieldId       String
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  fieldId       String    @db.ObjectId
   riskLevel     String
   confidence    Float
   recommendedAction String?

@@ -23,9 +23,7 @@ export default function LoginPage() {
 
       const data = await res.json()
 
-      if (!res.ok) {
-        throw new Error(data.message || 'Login failed')
-      }
+      if (!res.ok) throw new Error(data.message)
 
       toast.success('Login successful!')
       
@@ -35,7 +33,7 @@ export default function LoginPage() {
         router.push('/agent')
       }
     } catch (error: any) {
-      toast.error(error.message || 'Login failed')
+      toast.error(error.message)
     } finally {
       setLoading(false)
     }
@@ -52,44 +50,34 @@ export default function LoginPage() {
         
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email Address
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
               required
-              placeholder="admin@agrinova.com"
             />
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Password
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
               required
-              placeholder="????????"
             />
           </div>
           
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all disabled:opacity-50"
-          >
-            {loading ? 'Logging in...' : 'Login'}
+          <button type="submit" disabled={loading} className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">
+            {loading ? 'Loading...' : 'Login'}
           </button>
         </form>
         
-        <div className="mt-6 text-center text-sm text-gray-500">
-          <p className="font-semibold mb-2">Demo Credentials:</p>
+        <div className="mt-6 text-center text-sm">
+          <p className="font-semibold">Demo Credentials:</p>
           <p>Admin: admin@agrinova.com / admin123</p>
           <p>Agent: john@agrinova.com / agent123</p>
         </div>
