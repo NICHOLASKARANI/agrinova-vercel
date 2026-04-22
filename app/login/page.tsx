@@ -1,27 +1,49 @@
-﻿'use client'
+'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import toast, { Toaster } from 'react-hot-toast'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Simple demo login
-    if (email === 'admin@agrinova.com' && password === 'admin123') {
-      router.push('/admin')
-    } else if (email === 'john@agrinova.com' && password === 'agent123') {
-      router.push('/agent')
-    } else {
-      alert('Invalid credentials')
+    setLoading(true)
+    
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.message || 'Login failed')
+      }
+
+      toast.success('Login successful!')
+      
+      if (data.user.role === 'ADMIN') {
+        router.push('/admin')
+      } else {
+        router.push('/agent')
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Login failed')
+    } finally {
+      setLoading(false)
     }
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50">
+      <Toaster position="top-right" />
       <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-green-600 mb-2">AgriNova</h1>
@@ -53,15 +75,16 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
               required
-              placeholder="••••••••"
+              placeholder="????????"
             />
           </div>
           
           <button
             type="submit"
-            className="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all"
+            disabled={loading}
+            className="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all disabled:opacity-50"
           >
-            Login
+            {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
         
